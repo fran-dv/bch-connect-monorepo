@@ -234,25 +234,24 @@ export const Example: React.FC = () => {
 };
 ```
 
-## <a name="roadmap"></a> 🌱 Roadmap (tentative)
+## <a name="roadmap"></a> 🌱 Roadmap
 
 **Current focus**
 
-- Fix Paytaca connection issue
+- Compatibilize with all wallets out of the box
 - Write automated tests
+- Build a custom UI
+- Create a good online documentation
 
 **Next tasks**
 
-- Create comprehensive online documentation
 - Engage with the community and promote the library
 - Iterate and improve based on feedback
 
-### Future possibilities (not guaranteed)
+### Future possibilities
 
-- Build a custom connection modal UI to decouple it from AppKit UI and wc2-bch-bcr
+- Expand the library beyond React (Vue, vanila JS, etc.)
 - Add support for CashConnect specification which is currently in pre-alpha
-- Expand the library beyond React
-- Develop a `bch-connect-wallet-side` companion library to simplify wallet-side integration (this is a mid- to long-term idea and may not be feasible)
 
 ## <a name="api-reference"></a> 🧩 API Reference
 
