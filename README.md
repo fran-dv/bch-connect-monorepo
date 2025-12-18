@@ -1,4 +1,4 @@
-# BCH Connect
+<!-- # BCH Connect
 
 [![npm version](https://img.shields.io/npm/v/bch-connect.svg?style=flat-square)](https://www.npmjs.com/package/bch-connect)
 [![License](https://img.shields.io/github/license/fran-dv/bch-connect?style=flat-square)](./LICENSE)
@@ -275,11 +275,7 @@ interface Configuration {
   };
   modalConfig?: Omit<
     CreateAppKit,
-    | "projectId"
-    | "metadata"
-    | "manualWCControl"
-    | "networks"
-    | "universalProvider"
+    "projectId" | "metadata" | "manualWCControl" | "networks"
   >;
 }
 ```
@@ -290,7 +286,7 @@ interface Configuration {
 
 ### `<BCHConnectProvider config={config}>`
 
-Provides the React context for BCH Connect, enabling wallet connections throughout your app.  
+Provides the React context for BCH Connect, enabling wallet connections throughout your app.
 This should wrap your root component (e.g. `App.tsx`).
 
 **Props:**
@@ -300,7 +296,7 @@ This should wrap your root component (e.g. `App.tsx`).
 
 ### `useWallet()`
 
-React hook to access the current wallet connection state and perform connect/disconnect actions.  
+React hook to access the current wallet connection state and perform connect/disconnect actions.
 Must be used within a `<BCHConnectProvider>` context.
 
 **Returns:**
@@ -335,7 +331,7 @@ interface UseWalletReturnType {
 
 ### `useSignTransaction()`
 
-React hook to sign Bitcoin Cash transactions with the connected wallet.  
+React hook to sign Bitcoin Cash transactions with the connected wallet.
 It works when your app is wrapped with `<BCHConnectProvider>` and when a wallet session is active.
 
 **Returns:**
@@ -343,7 +339,7 @@ It works when your app is wrapped with `<BCHConnectProvider>` and when a wallet 
 ```ts
 interface UseSignTransactionReturnType {
   signTransaction: (
-    options: WcSignTransactionRequest
+    options: WcSignTransactionRequest,
   ) => Promise<WcSignTransactionResponse | undefined>;
 }
 ```
@@ -378,7 +374,7 @@ interface WcSignTransactionResponse {
 
 ### `useSignMessage()`
 
-React hook to sign arbitrary messages with the connected wallet.  
+React hook to sign arbitrary messages with the connected wallet.
 It works when your app is wrapped with `<BCHConnectProvider>` and when a wallet session is active.
 
 **Returns:**
@@ -386,7 +382,7 @@ It works when your app is wrapped with `<BCHConnectProvider>` and when a wallet 
 ```ts
 interface UseSignMessageReturnType {
   signMessage: (
-    options: WcSignMessageRequest
+    options: WcSignMessageRequest,
   ) => Promise<WcSignMessageResponse | undefined>;
 }
 ```
@@ -469,4 +465,13 @@ Licensed under MIT – feel free to copy, modify, and use the code in your own p
 
 ---
 
-Built with 💚 by [fran-dv](https://github.com/fran-dv)
+Built with 💚 by [fran-dv](https://github.com/fran-dv) -->
+
+# BCH Connect
+
+[![npm version](https://img.shields.io/npm/v/bch-connect.svg?style=flat-square)](https://www.npmjs.com/package/bch-connect)
+[![License](https://img.shields.io/github/license/fran-dv/bch-connect?style=flat-square)](./LICENSE)
+
+A React library to seamlessly integrate Bitcoin Cash wallet connections in your dApps. 🚀
+
+**_🚧 Actively working on the docs..._**
