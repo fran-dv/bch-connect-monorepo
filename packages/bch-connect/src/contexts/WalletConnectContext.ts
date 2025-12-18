@@ -1,5 +1,5 @@
-import type { Configuration } from "@/config/config";
-import type { UniversalConnector } from "@reown/appkit-universal-connector";
+import type { Configuration, OldSignClient, SignClient } from "@/models/config";
+import type { SessionTypes } from "@walletconnect/types";
 import { createContext, useContext } from "react";
 
 export type ConnectWalletCallback = () => Promise<void>;
@@ -7,12 +7,12 @@ export type DisconnectWalletCallback = () => Promise<void>;
 
 export interface WalletConnectContext {
   config: Configuration;
-  session: UniversalConnector["provider"]["session"] | null;
-  provider: UniversalConnector["provider"] | null;
-  connectError: Error | null;
-  disconnectError: Error | null;
+  session: SessionTypes.Struct | null;
+  signClient: SignClient | OldSignClient | null;
   connect: ConnectWalletCallback;
   disconnect: DisconnectWalletCallback;
+  connectError: Error | null;
+  disconnectError: Error | null;
 }
 
 export const WalletConnectContext = createContext<WalletConnectContext | null>(

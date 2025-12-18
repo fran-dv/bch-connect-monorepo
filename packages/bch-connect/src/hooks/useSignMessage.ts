@@ -3,9 +3,8 @@ import type {
   WcSignMessageResponse,
 } from "@bch-wc2/interfaces";
 import { useWalletConnectContext } from "../contexts/WalletConnectContext";
-import { NetworksIds } from "@/config/config";
 import { stringify } from "@bitauth/libauth";
-import { BCHMethods } from "@/config/config";
+import { BCH_METHOD, CAIP_NETWORK_ID } from "@/models/config";
 
 export interface UseSignMessageReturnType {
   signMessage: (
@@ -14,30 +13,30 @@ export interface UseSignMessageReturnType {
 }
 
 export const useSignMessage = (): UseSignMessageReturnType => {
-  const { provider, session, config } = useWalletConnectContext();
+  const { signClient, session, config } = useWalletConnectContext();
 
   const signMessage = async (
     options: WcSignMessageRequest,
   ): Promise<WcSignMessageResponse | undefined> => {
-    if (!provider || !session) {
+    if (!signClient || !session) {
       throw new Error(
         "Error signing messages: Provider or session is not defined",
       );
     }
 
     try {
-      const response = await provider.client.request<WcSignMessageResponse>({
-        chainId: NetworksIds[config.network],
+      const response = await signClient.request<WcSignMessageResponse>({
+        chainId: CAIP_NETWORK_ID[config.network],
         topic: session.topic,
         request: {
-          method: BCHMethods.signMessage,
+          method: BCH_METHOD.signMessage,
           params: JSON.parse(stringify(options)),
         },
       });
 
       return response;
     } catch (err) {
-      throw new Error(`Error signing message: ${err}`);
+      throw err as Error & { code: number };
     }
   };
 

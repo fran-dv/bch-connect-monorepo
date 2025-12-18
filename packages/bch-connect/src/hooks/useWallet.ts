@@ -6,6 +6,9 @@ import {
 import addressToTokenAddress from "@/utils/addressToTokenAddress";
 import { useCallback, useEffect, useState } from "react";
 import useGetAddresses from "@/hooks/useGetAddresses";
+import { decodeCashAddress } from "@bitauth/libauth";
+import type { SessionTypes } from "@walletconnect/types";
+import { BCH_EVENT } from "@/models/config";
 
 export interface UseWalletReturnType {
   address: string | null;
@@ -14,6 +17,7 @@ export interface UseWalletReturnType {
   addressError: Error | null;
   tokenAddressError: Error | null;
   isConnected: boolean;
+  session: SessionTypes.Struct | null;
   connectError: Error | null;
   disconnectError: Error | null;
   isError: boolean;
@@ -26,14 +30,13 @@ export const useWallet = (): UseWalletReturnType => {
   const {
     connect,
     disconnect,
+    signClient,
     session,
-    provider,
     config,
     connectError,
     disconnectError,
   } = useWalletConnectContext();
   const { getAddresses } = useGetAddresses();
-  const isConnected = !!session;
   const [address, setAddress] = useState<string | null>(null);
   const [areAddressesLoading, setAreAddressesLoading] = useState(false);
   const [addressError, setAddressError] = useState<Error | null>(null);
@@ -41,18 +44,26 @@ export const useWallet = (): UseWalletReturnType => {
   const [tokenAddressError, setTokenAddressError] = useState<Error | null>(
     null,
   );
-  const isError = !!addressError || !!connectError || !!disconnectError;
+  const isConnected = !!session;
+  const isError =
+    !!connectError ||
+    !!disconnectError ||
+    !!addressError ||
+    !!tokenAddressError;
 
   const fetchAddresses = useCallback(async () => {
     setAreAddressesLoading(true);
     try {
       const addresses = await getAddresses();
 
-      if (!addresses) return;
+      if (!addresses) {
+        throw new Error("No addresses found calling getAddresses");
+      }
 
       setAddress(addresses[0]);
       setAddressError(null);
     } catch (err) {
+      // The previous address remains
       setAddressError(err as Error);
     } finally {
       setAreAddressesLoading(false);
@@ -72,29 +83,44 @@ export const useWallet = (): UseWalletReturnType => {
       return;
     }
 
+    if (config.debug)
+      console.log("NAMESPACE RECEIVED ADDRESS: ", namespaceAddress);
     const prefix = "bch:";
     const cleanAddress = namespaceAddress.replace(prefix, "");
+
+    const decodedAddress = decodeCashAddress(cleanAddress);
+    const isValidAdress = typeof decodedAddress !== "string";
+    if (!isValidAdress) {
+      setAddress(null);
+      setAddressError(
+        new Error(
+          `Invalid namespace received address: ${cleanAddress}. Error decoding it: ${decodedAddress}`,
+        ),
+      );
+      return;
+    }
+
     setAddress(cleanAddress);
     setAddressError(null);
-  }, [session]);
+  }, [session, config.debug]);
 
   useEffect(() => {
-    if (!provider) return;
+    if (!signClient) return;
 
-    const handleAddressesChanged = () => {
-      fetchAddresses();
-    };
-
-    provider.on("addressesChanged", handleAddressesChanged);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const addressEvent = BCH_EVENT.addressesChanged as any;
+    const handleAddressesChanged = () => fetchAddresses();
+    signClient.on(addressEvent, handleAddressesChanged);
 
     return () => {
-      provider.removeListener("addressesChanged", handleAddressesChanged);
+      signClient.removeListener(addressEvent, handleAddressesChanged);
     };
-  }, [fetchAddresses, provider]);
+  }, [fetchAddresses, signClient]);
 
   useEffect(() => {
     if (!address) {
       setTokenAddress(null);
+      setTokenAddressError(null);
       return;
     }
 
@@ -106,6 +132,7 @@ export const useWallet = (): UseWalletReturnType => {
       setTokenAddress(tokenAddress);
       setTokenAddressError(null);
     } catch (err) {
+      setTokenAddress(null);
       setTokenAddressError(err as Error);
     }
   }, [address, config.network]);
@@ -117,6 +144,7 @@ export const useWallet = (): UseWalletReturnType => {
     addressError,
     tokenAddressError,
     isConnected,
+    session,
     connectError,
     disconnectError,
     isError,

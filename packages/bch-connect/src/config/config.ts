@@ -1,103 +1,90 @@
-import type { CreateAppKit } from "@reown/appkit";
-import type { CustomCaipNetwork } from "@reown/appkit-common";
-import { UniversalConnector } from "@reown/appkit-universal-connector";
+import {
+  BCH_EVENT,
+  BCH_METHOD,
+  CAIP_NETWORK_ID,
+  NETWORK_INDEX,
+  SESSION_TYPE,
+  type Configuration,
+  type InitializeConnectionReturnType,
+  type OldSignClient,
+  type SignClient,
+} from "@/models/config";
+import { bchConnectModal } from "@/adapters/bchConnectModalAdapter";
+import type { Modal } from "@/models/modal";
 
-export const NetworksIds: Record<
-  "mainnet" | "testnet" | "regtest",
-  "bch:bitcoincash" | "bch:bchtest" | "bch:bchreg"
-> = {
-  mainnet: "bch:bitcoincash",
-  testnet: "bch:bchtest",
-  regtest: "bch:bchreg",
-} as const;
+declare const __createdConfigBrand: unique symbol;
 
-export const BCHMethods = {
-  getAddresses: "bch_getAddresses",
-  signTransaction: "bch_signTransaction",
-  signMessage: "bch_signMessage",
-} as const;
+export type CreatedConfig = Configuration & {
+  readonly [__createdConfigBrand]: true;
+};
 
-const bchMainnet: CustomCaipNetwork<"bch"> = {
-  id: "bch",
-  chainNamespace: "bch" as const,
-  caipNetworkId: NetworksIds.mainnet,
-  name: "Bitcoin Cash",
-  nativeCurrency: { name: "Bitcoin Cash", symbol: "BCH", decimals: 8 },
-  rpcUrls: { default: { http: [] } },
-  testnet: false,
-} as const;
+export const createConfig = (options: Configuration): CreatedConfig =>
+  ({
+    supportLegacyClient: true,
+    debug: false,
+    modal: bchConnectModal(),
+    ...options,
+  }) as CreatedConfig;
 
-const bchTestnet: CustomCaipNetwork<"bch"> = {
-  id: "bch",
-  chainNamespace: "bch" as const,
-  caipNetworkId: NetworksIds.testnet,
-  name: "Bitcoin Cash (Testnet)",
-  nativeCurrency: { name: "Bitcoin Cash", symbol: "BCH", decimals: 8 },
-  rpcUrls: { default: { http: [] } },
-  testnet: true,
-} as const;
-
-const bchRegtest: CustomCaipNetwork<"bch"> = {
-  id: "bch",
-  chainNamespace: "bch" as const,
-  caipNetworkId: NetworksIds.regtest,
-  name: "Bitcoin Cash (Regtest)",
-  nativeCurrency: { name: "Bitcoin Cash", symbol: "BCH", decimals: 8 },
-  rpcUrls: { default: { http: [] } },
-  testnet: true,
-} as const;
-
-export const Networks: Record<
-  "mainnet" | "testnet" | "regtest",
-  CustomCaipNetwork
-> = {
-  mainnet: bchMainnet as CustomCaipNetwork,
-  testnet: bchTestnet as CustomCaipNetwork,
-  regtest: bchRegtest as CustomCaipNetwork,
-} as const;
-
-export interface Configuration {
-  projectId: string;
-  network: "mainnet" | "testnet" | "regtest";
-  metadata: {
-    name: string;
-    description: string;
-    url: string;
-    icons: string[];
+export const getNamespaces = (
+  network: NETWORK_INDEX | keyof typeof NETWORK_INDEX,
+) => {
+  return {
+    bch: {
+      chains: [CAIP_NETWORK_ID[network]],
+      methods: Object.values(BCH_METHOD) as BCH_METHOD[],
+      events: Object.values(BCH_EVENT) as BCH_EVENT[],
+    },
   };
-  modalConfig?: Omit<
-    CreateAppKit,
-    | "projectId"
-    | "metadata"
-    | "manualWCControl"
-    | "networks"
-    | "universalProvider"
-  >;
-}
+};
 
-export const createConfig = (options: Configuration): Configuration => options;
-
-export async function getUniversalConnector({
+const getSignClient = async ({
   projectId,
-  network,
   metadata,
-  modalConfig,
-}: Configuration): Promise<UniversalConnector> {
-  const universalConnector = await UniversalConnector.init({
-    projectId,
-    networks: [
-      {
-        methods: Object.values(BCHMethods),
-        chains: [Networks[network]],
-        events: ["addressesChanged"],
-        namespace: "bch",
-      },
-    ],
-    metadata,
-    modalConfig,
-  }).catch((err) => {
-    throw err;
-  });
+  supportLegacyClient,
+  debug,
+}: Configuration): Promise<SignClient | OldSignClient> => {
+  if (supportLegacyClient) {
+    const { default: OldSignClient } = await import("sign-client-v2-20");
 
-  return universalConnector;
-}
+    return await OldSignClient.init({
+      projectId,
+      relayUrl: "wss://relay.walletconnect.com",
+      metadata,
+      logger: debug ? "debug" : undefined,
+    });
+  }
+
+  const { default: SignClient } = await import("@walletconnect/sign-client");
+
+  return await SignClient.init({
+    projectId,
+    relayUrl: "wss://relay.walletconnect.com",
+    metadata,
+    logger: debug ? "debug" : undefined,
+  });
+};
+
+export const initializeConnection = async (
+  config: Configuration,
+): Promise<InitializeConnectionReturnType> => {
+  const signClient = await getSignClient(config);
+
+  let modal: Modal;
+  const modalSource = config.modal ?? bchConnectModal();
+
+  if (typeof modalSource === "function") {
+    modal = await modalSource({
+      projectId: config.projectId,
+      network: config.network,
+      sessionType: SESSION_TYPE.walletConnectV2,
+    });
+  } else {
+    modal = modalSource;
+  }
+
+  return {
+    signClient,
+    modal,
+  };
+};

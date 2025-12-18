@@ -8,23 +8,28 @@ export interface AddressToTokenAddressParams {
   network: "mainnet" | "testnet" | "regtest";
 }
 
+const Prefixes = {
+  mainnet: "bitcoincash",
+  testnet: "bchtest",
+  regtest: "bchreg",
+} as const;
+
 export const addressToTokenAddress = ({
   address,
   network,
 }: AddressToTokenAddressParams) => {
-  const toBytecodeResult = cashAddressToLockingBytecode(address);
+  const addressWithPrefix = !address.includes(Prefixes[network])
+    ? `${Prefixes[network]}:${address}`
+    : address;
+
+  const toBytecodeResult = cashAddressToLockingBytecode(addressWithPrefix);
 
   if (typeof toBytecodeResult === "string") {
     throw new Error(toBytecodeResult);
   }
 
   const toAddressresult = lockingBytecodeToCashAddress({
-    prefix:
-      network === "mainnet"
-        ? "bitcoincash"
-        : network === "testnet"
-          ? "bchtest"
-          : "bchreg",
+    prefix: Prefixes[network],
     bytecode: toBytecodeResult.bytecode,
     tokenSupport: true,
   });

@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BCH Connect Modal playground</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <style>
+      body {
+        font-family:
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          sans-serif;
+        background: #050816;
+        color: #f5f5f5;
+        padding: 2rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        align-items: center;
+      }
+      button {
+        padding: 0.5rem 0.75rem;
+        background-color: var(--bchc-green);
+        color: var(--bchc-text-primary);
+        border: none;
+        font-size: 1rem;
+        font-weight: 600;
+        border-radius: 0.75rem;
+        max-width: 300px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>BCH Connect Modal playground</h1>
+    <button class="playground-button">Open modal</button>
+    <button class="theme-button">Toggle theme. Current: Dark</button>
+
+    <script src="../dist/index.global.js"></script>
+    <script>
+      const { createBCHConnectModal } = window.BCHConnectModal;
+      let theme = "dark";
+
+      const modal = createBCHConnectModal({
+        sessionType: "Wallet Connect V2",
+        theme,
+      });
+
+      document
+        .querySelector(".playground-button")
+        .addEventListener("click", () => {
+          modal.open({
+            uri: "https://bchconnect.dev?randomstufftomaketheqrabitmorecomplex=loremipsum",
+          });
+        });
+
+      const themeBtn = document.querySelector(".theme-button");
+      document.querySelector(".theme-button").addEventListener("click", () => {
+        theme = theme === "dark" ? "light" : "dark";
+        themeBtn.textContent = `Toggle theme. Current: ${theme}`;
+        modal.setTheme(theme);
+      });
+    </script>
+  </body>
+</html>
