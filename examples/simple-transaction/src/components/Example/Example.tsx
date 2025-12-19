@@ -21,9 +21,10 @@ export const Example: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const proposeTransactionToWallet = async (values: TransferFormValues) => {
-    if (!address || !provider) return;
+    if (!isConnected || !address || !provider) return;
 
     setIsLoading(true);
+
     const wcTransactionObj = await getSimpleTransaction({
       provider,
       sender: address,
@@ -33,10 +34,18 @@ export const Example: React.FC = () => {
 
     showMessage("Please sign the transaction in your wallet...");
     try {
-      await signTransaction(wcTransactionObj);
-      showSuccess("Transaction signed successfully");
+      const response = await signTransaction({ txRequest: wcTransactionObj });
+      if (!response) {
+        showMessage(
+          "Transaction status couldn’t be tracked. Please check your wallet to see if it was sent or rejected.",
+        );
+        return;
+      }
+      showSuccess(
+        `Tx signed successfully. Hash: ${response.signedTransactionHash}`,
+      );
     } catch (error) {
-      const errorMsg = (error as { message: string }).message;
+      const errorMsg = (error as Error).message;
       showError("Failed to sign transaction: " + errorMsg);
     } finally {
       setIsLoading(false);

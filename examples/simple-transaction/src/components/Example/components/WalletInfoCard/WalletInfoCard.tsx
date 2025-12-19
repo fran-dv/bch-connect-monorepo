@@ -4,7 +4,7 @@ interface Props {
   isConnected: boolean;
   address: string | null;
   tokenAddress: string | null;
-  balance: number;
+  balance: number | undefined;
   balanceError: string | null;
 }
 export const WalletInfoCard: React.FC<Props> = ({
@@ -32,7 +32,9 @@ export const WalletInfoCard: React.FC<Props> = ({
         <span className="mr-1 font-bold text-base sm:text-lg ">
           Balance in sats:
         </span>{" "}
-        {balanceError ? balanceError : balance}
+        {balanceError
+          ? `${balanceError}. Please reload the page`
+          : (balance ?? "Loading balance...")}
       </p>
     </div>
   );

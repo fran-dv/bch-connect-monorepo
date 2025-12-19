@@ -7,13 +7,15 @@ import useNetworkProviderStore from "@/stores/useNetworkProviderStore";
 import { useEffect } from "react";
 import { ElectrumNetworkProvider } from "cashscript";
 import { Footer } from "@/components/Footer";
+import { currentNetwork } from "./main";
 
 function App() {
   const { setProvider } = useNetworkProviderStore();
+  const network = currentNetwork === "testnet" ? "chipnet" : "mainnet";
 
   useEffect(() => {
-    setProvider(new ElectrumNetworkProvider("chipnet"));
-  }, [setProvider]);
+    setProvider(new ElectrumNetworkProvider(network));
+  }, [setProvider, network]);
 
   return (
     <>

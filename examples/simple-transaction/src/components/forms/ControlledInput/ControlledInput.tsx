@@ -39,7 +39,7 @@ export const ControlledInput = <T extends FieldValues>({
         render={({ field }) => (
           <input
             className={
-              "text-base border-1 border-white-bch rounded-full py-2 px-3 focus:outline-1 focus:outline-green-bch focus:border-transparent"
+              "text-base border border-white-bch rounded-full py-2 px-3 focus:outline-1 focus:outline-green-bch focus:border-transparent"
             }
             id={name}
             type={type}

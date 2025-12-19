@@ -25,7 +25,6 @@ export const getSimpleTransaction = async ({
     connectedWalletUTXOs.reduce((acc, utxo) => acc + utxo.satoshis, 0n) -
     outputAmount -
     1000n;
-
   const transactionBuilder = new TransactionBuilder({ provider });
   transactionBuilder.addInputs(connectedWalletUTXOs, placeHolderUnlocker);
   transactionBuilder.addOutput({

@@ -7,7 +7,7 @@ interface Props {
 
 export const useBalance = ({ address }: Props) => {
   const { provider } = useNetworkProviderStore();
-  const [balance, setBalance] = useState<number>(0);
+  const [balance, setBalance] = useState<number | undefined>(undefined);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -27,8 +27,9 @@ export const useBalance = ({ address }: Props) => {
         setError("Error fetching balance");
       }
     };
+    fetchBalance();
 
-    const interval = setInterval(fetchBalance, 5000);
+    const interval = setInterval(fetchBalance, 10000);
 
     return () => clearInterval(interval);
   }, [address, provider]);

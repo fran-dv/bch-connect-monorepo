@@ -14,7 +14,7 @@ export const SubmitButton: React.FC<Props> = ({
     <button
       type="submit"
       className={clsx(
-        "flex items-center gap-2 text-white-bch bg-green-bch w-full px-4 py-2 rounded-full justify-center text-lg font-bold uppercase",
+        "flex items-center gap-2 text-white-bch cursor-pointer bg-green-bch w-full px-4 py-2 rounded-full justify-center text-lg font-bold uppercase",
         className,
       )}
       {...rest}

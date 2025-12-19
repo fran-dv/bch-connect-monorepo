@@ -6,7 +6,7 @@ import {
 interface Props {
   isConnected: boolean;
   onFormSubmit: (values: TransferFormValues) => Promise<void>;
-  balance: number;
+  balance: number | undefined;
   isLoading: boolean;
 }
 
@@ -18,7 +18,7 @@ export const TransferCard: React.FC<Props> = ({
 }: Props) => {
   return (
     <div className="flex w-full items-center p-6 md:p-10 bg-black-bch/75 z-10 rounded-3xl shadow-xl backdrop-blur-xs text-white-bch ">
-      {isConnected ? (
+      {isConnected && balance !== undefined ? (
         <div className="flex flex-col gap-3 w-full">
           <h2 className="text-xl md:text-2xl font-bold">
             Transfer some sats (testnet)
@@ -29,6 +29,12 @@ export const TransferCard: React.FC<Props> = ({
             balance={balance}
           />
         </div>
+      ) : isConnected && balance === undefined ? (
+        <div className="flex flex-col gap-2 align-baseline">
+          <h3 className="font-bold text-base sm:text-lg md:text-xl">
+            Loading balance...
+          </h3>
+        </div>
       ) : (
         <div className="flex flex-col gap-2 align-baseline">
           <h3 className="font-bold text-base sm:text-lg md:text-xl">
@@ -37,29 +43,14 @@ export const TransferCard: React.FC<Props> = ({
           </h3>
           <br />
           <p className="text-base md:text-lg">
-            To get started, please use a supported wallet:
-          </p>
-          <ul className="flex flex-col gap-2 align-baseline list-disc pl-6">
-            <li>
-              <a
-                className="text-green-bch text-base md:text-lg font-bold hover:underline"
-                href="https://cashonize.com/"
-              >
-                Cashonize
-              </a>
-            </li>
-          </ul>
-          <br />
-          <p className="text-sm sm:text-base italic">
-            * The library also supports{" "}
+            To get started, you'll need a wallet that supports the Bitcoin Cash
+            testnet. We recommend using{" "}
             <a
-              href="https://zapit.io/"
               className="text-green-bch text-base md:text-lg font-bold hover:underline"
+              href="https://cashonize.com/"
             >
-              zapit
+              Cashonize
             </a>
-            , but it only works on the mainnet <br />
-            (this example is on the testnet).
           </p>
         </div>
       )}
