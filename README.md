@@ -1,26 +1,16 @@
-<!-- # BCH Connect
+# BCH Connect
 
 [![npm version](https://img.shields.io/npm/v/bch-connect.svg?style=flat-square)](https://www.npmjs.com/package/bch-connect)
 [![License](https://img.shields.io/github/license/fran-dv/bch-connect?style=flat-square)](./LICENSE)
 
 A React library to seamlessly integrate Bitcoin Cash wallet connections in your dApps. 🚀
 
-It abstracts the implementation of [wc2-bch-bcr](https://github.com/mainnet-pat/wc2-bch-bcr) and [Reown AppKit](https://docs.reown.com/appkit/javascript/core/installation#others-networks-appkit-core-3), providing simple React hooks to connect and use Bitcoin Cash wallets.
-
-> ⚠️ This library is at its early stages, so expect changes and bugs, and use it at your own risk.
-
-**Supported wallets:**
-
-- [Cashonize](https://cashonize.com) (Mainnet and Testnet)
-- [Zapit](https://zapit.io/) (Mainnet only)
-
-> Other wallets which implement wc2-bch-bcr may work, but I haven't tested them. [Paytaca](https://www.paytaca.com/) hasn't worked for me. If you know how to make it work, please consider contributing!
+**_🚧 Actively working on online docs..._**
 
 ## Table of contents
 
 - [⚡ Getting started](#getting-started)
 - [💡 Example](#example)
-- [🌱 Roadmap](#roadmap)
 - [🧩 API reference](#api-reference)
 - [🧑‍💻 Local development](#local-development)
 - [🤝 Contribute](#contribute)
@@ -33,11 +23,9 @@ Installing and using **bch-connect** is straightforward. Just follow these steps
 
 ```bash
 npm install bch-connect
-# or
-bun add bch-connect
-# or
-yarn add bch-connect
 ```
+
+Or replace `npm` with your preferred package manager.
 
 **2. Set up your configuration**
 
@@ -55,6 +43,7 @@ export const config = createConfig({
     url: "https://your-dapp.com",
     icons: ["https://placehold.co/600x400?text=YourDApp"],
   },
+  debug: true,
 });
 ```
 
@@ -81,46 +70,18 @@ function App() {
 ```tsx
 import { useWallet } from "bch-connect";
 
-function ConnectButton() {
+const ConnectButton = () => {
   const { connect } = useWallet();
 
   return <button onClick={connect}>Connect Wallet</button>;
-}
+};
 ```
-
-If you have any doubts, here's a minimal setup example:
-
-```tsx
-// App.tsx
-import { createConfig, BCHConnectProvider } from "bch-connect";
-
-const config = createConfig({
-  projectId: "your-reown-project-id", // Get it from https://dashboard.reown.com
-  network: "testnet", // or "mainnet"
-  metadata: {
-    name: "Your dApp name",
-    description: "Your dApp description",
-    url: "https://your-dapp.com",
-    icons: ["https://placehold.co/600x400?text=YourDApp"],
-  },
-});
-
-function App() {
-  return (
-    <BCHConnectProvider config={config}>
-      {/* Rest of your app */}
-    </BCHConnectProvider>
-  );
-}
-```
-
-See the [Example](#example) section for a working demo.
 
 ## <a name="example"></a> 💡 Example
 
 Visit the example [**live demo here**](https://bch-connect-example.netlify.app/).
 
-Below are some code snippets from the example app. To view the full source code or run it locally, check the [example](examples) folder in this repository.
+Below are some code snippets from the example app. To view the full code or run it locally, check the [simple-transaction example](examples/simple-transaction/) folder in this repository.
 
 ### Connect button:
 
@@ -128,6 +89,7 @@ Below are some code snippets from the example app. To view the full source code 
 // other imports...
 import { useWallet } from "bch-connect";
 
+// styles and UI code are omitted here
 export const ConnectButton: React.FC<
   ButtonHTMLAttributes<HTMLButtonElement>
 > = (props: ButtonHTMLAttributes<HTMLButtonElement>) => {
@@ -137,14 +99,12 @@ export const ConnectButton: React.FC<
     if (isConnected) return;
     connect();
   };
-
   const handleWalletDisconnect = () => {
     disconnect();
   };
 
   return (
-    <>
-      {/* ... other UI code ... */}
+    <div>
       <button {...props} onClick={handleWalletConnect}>
         {isConnected && address ? (
           <Address address={address} />
@@ -154,22 +114,21 @@ export const ConnectButton: React.FC<
       </button>
 
       {isConnected && (
-        <button title="Disconnect wallet" onClick={handleWalletDisconnect}>
+        <button onClick={handleWalletDisconnect}>
           <ExitIcon />
         </button>
       )}
-    </>
+    </div>
   );
 };
 
 export default ConnectButton;
 ```
 
-### Sending transactions with recipient and amount entered through a form:
+### Sending a transaction using bch-connect and cashscript SDK, with recipient and amount entered through a form:
 
 ```tsx
 // other imports...
-import type { WcTransactionObject } from "cashscript";
 import { useSignTransaction, useWallet } from "bch-connect";
 
 export const Example: React.FC = () => {
@@ -178,19 +137,19 @@ export const Example: React.FC = () => {
   const { signTransaction } = useSignTransaction();
   // -----------------
 
-  // other hooks from the example project
+  // other hooks from the example app
   const { showSuccess, showError, showMessage } = useUserMessages();
-  const { provider } = useNetworkProviderStore();
-  const { balance, error: balanceError } = useBalance({ address: address });
+  const { provider } = useNetworkProviderStore(); // Cashscript's NetworkProvider
+  const { balance, error: balanceError } = useBalance({ address });
   const [isLoading, setIsLoading] = useState(false);
 
   const proposeTransactionToWallet = async (values: TransferFormValues) => {
-    if (!address || !provider) return;
+    if (!isConnected || !address || !provider) return;
 
     setIsLoading(true);
 
-    // helper function which creates a transaction object using CashScript
-    const wcTransactionObj: WcTransactionObject = await getSimpleTransaction({
+    // helper function to create a transaction object
+    const wcTransactionObj = await getSimpleTransaction({
       provider,
       sender: address,
       amount: values.satoshis,
@@ -200,12 +159,22 @@ export const Example: React.FC = () => {
     showMessage("Please sign the transaction in your wallet...");
 
     // Request signature of the generated transaction to the wallet
-    // showing feedback to the user
     try {
-      await signTransaction(wcTransactionObj);
-      showSuccess("Transaction signed successfully");
+      const response = await signTransaction({ txRequest: wcTransactionObj });
+
+      // Defensive checking for malformed response received from wallet
+      if (!response) {
+        showMessage(
+          "Transaction status couldn’t be tracked. Please check your wallet to see if it was sent or rejected.",
+        );
+        return;
+      }
+
+      showSuccess(
+        `Tx signed successfully. Hash: ${response.signedTransactionHash}`,
+      );
     } catch (error) {
-      const errorMsg = (error as { message: string }).message;
+      const errorMsg = (error as Error).message;
       showError("Failed to sign transaction: " + errorMsg);
     } finally {
       setIsLoading(false);
@@ -213,7 +182,7 @@ export const Example: React.FC = () => {
   };
 
   // Below, TransferCard has the form, which call proposeTransactionToWallet on submit
-  // WalletInfoCard just shows addresses and balance
+  // and WalletInfoCard just shows addresses and balance
   return (
     <section>
       <TransferCard
@@ -232,57 +201,82 @@ export const Example: React.FC = () => {
     </section>
   );
 };
+
+export default Example;
 ```
-
-## <a name="roadmap"></a> 🌱 Roadmap
-
-**Current focus**
-
-- Compatibilize with all wallets out of the box
-- Write automated tests
-- Build a custom UI
-- Create a good online documentation
-
-**Next tasks**
-
-- Engage with the community and promote the library
-- Iterate and improve based on feedback
-
-### Future possibilities
-
-- Expand the library beyond React (Vue, vanila JS, etc.)
-- Add support for CashConnect specification which is currently in pre-alpha
 
 ## <a name="api-reference"></a> 🧩 API Reference
 
-### `createConfig(options: Configuration): Configuration`
+### `createConfig(options: Configuration): CreatedConfig`
 
-Creates the configuration object required by `BCHConnectProvider`.
+Creates the configuration object required by `BCHConnectProvider`, applying defaults for you.
 
 **Parameters:**
 
 - `options`: `Configuration` object.
 
 ```ts
-interface Configuration {
+export interface Configuration {
   projectId: string;
-  network: "mainnet" | "testnet" | "regtest";
+  network: NETWORK_INDEX | keyof typeof NETWORK_INDEX; // "mainnet" | "testnet" | "regtest"
   metadata: {
     name: string;
     description: string;
     url: string;
     icons: string[];
   };
-  modalConfig?: Omit<
-    CreateAppKit,
-    "projectId" | "metadata" | "manualWCControl" | "networks"
-  >;
+  sessionType?: SessionType;
+  modal?: Modal | ModalFactory; // defaults to bchConnectModal()
+  supportLegacyClient?: boolean; // defaults to true. It ensures working with required namespaces
+  debug?: boolean; // defaults to false
 }
 ```
 
 **Returns:**
 
-- Same `Configuration` object.
+- `CreatedConfig` – branded configuration to pass to the provider.
+
+### `bchConnectModal(config?: BCHConnectModalConfig): Modal`
+
+[bch-connect-modal](/packages/bch-connect-modal/) factory function. Default modal adapter used when you don’t pass a `modal` to `createConfig`. Wraps the `bch-connect-modal` package and accepts the same configuration (with `sessionType` defaulting to `"Wallet Connect V2"`).
+
+**Parameters:**
+
+- `config` (optional): `BCHConnectModalConfig`
+
+```ts
+interface BCHConnectModalConfig {
+  sessionType: SessionType; // "Wallet Connect V2"
+  wallets?: {
+    id: string;
+    name: string;
+    iconUrl: string;
+    links: {
+      fallback: string;
+      native?: string;
+      universal?: string;
+      web?: string;
+    };
+  }[]; // optional curated wallet list
+  theme?: "light" | "dark" | "system"; // modal theme
+}
+```
+
+**Returns:**
+
+- `Modal` – object with `open({ uri })` and `close()` methods used internally by BCH Connect.
+
+### `reownModal(options): ModalFactory`
+
+Factory to use Reown AppKit’s modal. Pass the returned function as `modal` in `createConfig`. Accepts all `createAppKit` options except `projectId`, `metadata`, `manualWCControl`, and `networks` (BCH Connect injects those for you).
+
+**Parameters:**
+
+- `options`: `Omit<CreateAppKit, "projectId" | "metadata" | "manualWCControl" | "networks">`
+
+**Returns:**
+
+- `ModalFactory` – async factory that BCH Connect will call with `{ projectId, network, sessionType }` to build the modal.
 
 ### `<BCHConnectProvider config={config}>`
 
@@ -291,23 +285,26 @@ This should wrap your root component (e.g. `App.tsx`).
 
 **Props:**
 
-- `config`: `Configuration` – the object returned by [`createConfig`](#createconfigoptions-configuration-configuration).
+- `config`: `CreatedConfig` – the object returned by [`createConfig`](#createconfigoptions-configuration-createdconfig).
 - `children`: `React.ReactNode` – your application components.
 
 ### `useWallet()`
 
 React hook to access the current wallet connection state and perform connect/disconnect actions.
-Must be used within a `<BCHConnectProvider>` context.
+Must be used within a [`<BCHConnectProvider>`](#bchconnectprovider-configconfig) context.
 
 **Returns:**
 
 - `address` – the currently connected wallet address. It is automatically refetched when an `addressesChanged` event is emitted by the wallet.
 - `tokenAddress` – the [CashTokens](https://cashtokens.org/) aware address of the wallet, derived from `address`. It is automatically refetched when `address` changes.
+- `session` – the active WalletConnect session (`SessionTypes.Struct`) or `null` when disconnected.
+- `isConnected` – boolean indicating whether a wallet is currently connected.
+- `connect()` – initiates a wallet connection.
+- `disconnect()` – disconnects the current wallet session.
 - `refetchAddresses()` – programmatically refetches `address`, updating both `address` and `tokenAddress` states.
 - `areAddressesLoading` – boolean indicating whether the addresses are currently being loaded.
 - `addressError` – error object if an error occurred while fetching the address.
-- `tokenAddressError` – error object if an error occurred while fetching the token address.
-- `isConnected` – boolean indicating whether a wallet is currently connected.
+- `tokenAddressError` – error object if an error occurred while converting address to token address.
 - `connectError` – error object if an error occurred while connecting to a wallet.
 - `disconnectError` – error object if an error occurred while disconnecting from a wallet.
 - `isError` – boolean indicating whether an error occurred.
@@ -320,6 +317,7 @@ interface UseWalletReturnType {
   addressError: Error | null;
   tokenAddressError: Error | null;
   isConnected: boolean;
+  session: SessionTypes.Struct | null;
   connectError: Error | null;
   disconnectError: Error | null;
   isError: boolean;
@@ -332,23 +330,29 @@ interface UseWalletReturnType {
 ### `useSignTransaction()`
 
 React hook to sign Bitcoin Cash transactions with the connected wallet.
-It works when your app is wrapped with `<BCHConnectProvider>` and when a wallet session is active.
+It works within [`<BCHConnectProvider>`](#bchconnectprovider-configconfig) context and when a wallet session is active.
 
 **Returns:**
 
 ```ts
 interface UseSignTransactionReturnType {
   signTransaction: (
-    options: WcSignTransactionRequest,
-  ) => Promise<WcSignTransactionResponse | undefined>;
+    options: SignTransactionOpts,
+  ) => Promise<WcSignTransactionResponse | null>;
+}
+
+interface SignTransactionOpts {
+  txRequest: WcSignTransactionRequest;
+  requestExpirySeconds?: number; // defaults to 300 seconds
 }
 ```
 
-`WcSignTransactionRequest` and `WcSignTransactionResponse` are interfaces from [`@bch-wc2/interfaces`](https://github.com/mainnet-pat/bch-wc2), which are also re-exported by `bch-connect` for convenience.
+`WcSignTransactionRequest` and `WcSignTransactionResponse` are interfaces from [`@bch-wc2/interfaces`](https://github.com/mainnet-pat/bch-wc2) package, which are also re-exported by `bch-connect` for convenience.
 
 **`signTransaction` parameters:**
 
-- `options`: `WcSignTransactionRequest`
+- `options.txRequest`: `WcSignTransactionRequest`
+- `options.requestExpirySeconds`: optional expiration for the WalletConnect request in seconds (defaults to 300).
 
 ```ts
 interface WcSignTransactionRequest {
@@ -359,11 +363,12 @@ interface WcSignTransactionRequest {
 }
 ```
 
-You’ll commonly pass a `WcTransactionObject` from `cashscript` as the parameter to this function, which is fully supported
+You’ll commonly pass a `WcTransactionObject` from `cashscript` as the parameter to this function, which is fully compatible. This is shown in the [simple-transaction example](/examples/simple-transaction)
 
 **`signTransaction` returns:**
 
-- `Promise<WcSignTransactionResponse | undefined>` – resolves with the signed transaction response, or undefined if signing failed.
+- `Promise<WcSignTransactionResponse | null>` – resolves with the signed transaction response. Returns `null` when the wallet returns an invalid empty-object response, allowing you to show a neutral “status unknown” message. Throws if the WalletConnect client/session is missing or the wallet rejects/returns an error.
+  It should be used within a try / catch block.
 
 ```ts
 interface WcSignTransactionResponse {
@@ -402,60 +407,97 @@ interface WcSignMessageRequest {
 
 **`signMessage` returns:**
 
-- `Promise<WcSignMessageResponse | undefined>` – resolves with the message signature as a string, or undefined if signing failed.
+- `Promise<WcSignMessageResponse | undefined>` – resolves with the message signature as a string. Throws if the WalletConnect client/session is missing or the wallet rejects/returns an error.
+  It should be used within a try / catch block.
 
 ```ts
 type WcSignMessageResponse = string;
 ```
 
-## <a name="local-development"></a> 🧑‍💻 Local Development
+## <a name="local-development"></a> 🧑‍💻 Local Development (for contributors)
 
-To run this repository locally for development, follow these steps:
-
-1. Clone the repository
+This is a Bun-powered monorepo (`packages/*`, `examples/*`, `docs`). After cloning, install everything once from the root:
 
 ```bash
-git clone https://github.com/fran-dv/bch-connect.git
-```
-
-2. Install dependencies
-
-From the root of the repository:
-
-```bash
+git clone https://github.com/fran-dv/bch-connect-monorepo.git
+cd bch-connect-monorepo
 bun install
 ```
 
-This will install dependencies for both the library (packages/bch-connect) and the example app (examples).
+### Library (`packages/bch-connect`)
 
-3. Run the library in development mode
-
-To test the library live while developing, first link it in the example app’s package.json:
-
-```jsonc
-"dependencies": {
-  // ...
-  "bch-connect": "workspaces:*"
-}
-```
-
-Then, start the development server for the library:
+Development (tsup watch writes to `dist/`):
 
 ```bash
 cd packages/bch-connect
-bun dev #or the equivalent command for your package manager
+bun dev
 ```
 
-4. Run the example app
-
-In a separate terminal:
+Tests and tooling:
 
 ```bash
-cd examples
-bun dev #or the equivalent command for your package manager
+bun test            # or: bun test:coverage
+bun run lint
+bun run format
 ```
 
-> **Note:** The example project runs its scripts with Bun. If you prefer Node.js, you can update the scripts in `examples/package.json` accordingly.
+### Modal (`packages/bch-connect-modal`)
+
+Playground (watch + serve `src/index.html` with the built global bundle):
+
+```bash
+cd packages/bch-connect-modal
+bun run dev:playground  # serves at http://localhost:4173
+```
+
+The playground needs manual reload on the browser to see changes.
+
+Bundle without serving:
+
+```bash
+bun dev            # watch build
+bun run build      # without minification
+bun run build:prod # with minification
+```
+
+Tests:
+
+```bash
+bun test
+bun test:coverage
+```
+
+### Example app (`examples/simple-transaction`)
+
+Run the demo:
+
+```bash
+cd examples/simple-transaction
+bun dev
+```
+
+Build and preview:
+
+```bash
+bun run build
+bun run preview
+```
+
+### Docs site (`docs`)
+
+Preview locally (Next.js):
+
+```bash
+cd docs
+bun run dev
+```
+
+Production build and type/MDX checks:
+
+```bash
+bun run build
+bun run types:check
+```
 
 ## <a name="contribute"></a> 🤝 Contribute
 
@@ -465,13 +507,4 @@ Licensed under MIT – feel free to copy, modify, and use the code in your own p
 
 ---
 
-Built with 💚 by [fran-dv](https://github.com/fran-dv) -->
-
-# BCH Connect
-
-[![npm version](https://img.shields.io/npm/v/bch-connect.svg?style=flat-square)](https://www.npmjs.com/package/bch-connect)
-[![License](https://img.shields.io/github/license/fran-dv/bch-connect?style=flat-square)](./LICENSE)
-
-A React library to seamlessly integrate Bitcoin Cash wallet connections in your dApps. 🚀
-
-**_🚧 Actively working on the docs..._**
+Built with 💚 by [fran-dv](https://github.com/fran-dv)
