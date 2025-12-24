@@ -1,0 +1,33 @@
+{
+  "name": "create-bch-dapp",
+  "version": "0.2.0",
+  "private": false,
+  "type": "module",
+  "bin": {
+    "create-bch-dapp": "dist/index.js"
+  },
+  "files": [
+    "dist",
+    "templates"
+  ],
+  "scripts": {
+    "dev": "bun run src/index.ts",
+    "build": "tsup",
+    "build:prod": "tsup --minify",
+    "lint": "eslint .",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "@inquirer/prompts": "^8.1.0",
+    "kleur": "^4.1.5",
+    "ora": "^9.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.0.3",
+    "tsup": "^8.5.1",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

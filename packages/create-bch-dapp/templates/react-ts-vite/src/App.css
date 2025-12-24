@@ -1,0 +1,138 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.title {
+  font-size: 2.5rem;
+  line-height: 1.1;
+  margin-top: 0.25rem;
+}
+
+.brand-logos {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.brand-logos .logo {
+  width: 7.5rem;
+  height: auto;
+  padding: 1.1rem;
+  will-change: filter;
+  transition: filter 300ms;
+}
+
+.brand-logos .logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+
+.brand-logos .logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+.brand-logos .logo.bch:hover {
+  filter: drop-shadow(0 0 2em #2ecc71aa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.bchc-card {
+  display: grid;
+  gap: 0.9rem;
+  justify-items: center;
+}
+
+.bchc-primary {
+  min-width: 250px;
+}
+
+.bchc-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.bchc-actions > button {
+  min-width: 250px;
+}
+
+.bchc-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.bchc-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #888;
+  display: inline-block;
+}
+
+.bchc-status[data-connected="true"] .bchc-dot {
+  background: #2ecc71;
+}
+
+.bchc-statusText {
+  font-size: 0.95rem;
+  opacity: 0.9;
+}
+
+.bchc-panel {
+  width: min(680px, 92vw);
+  text-align: left;
+  padding: 0.75rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.bchc-panel--error {
+  border-color: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 80, 80, 0.08);
+}
+
+.bchc-panelTitle {
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.bchc-panelBody {
+  opacity: 0.9;
+}
+
+.bchc-code {
+  word-break: break-word;
+}
+
+.bchc-footer {
+  margin: 0.15rem 0 0;
+  opacity: 0.75;
+}

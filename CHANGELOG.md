@@ -20,7 +20,11 @@
 
 **bch-connect-modal:**
 
-- Created a framework-agnostic, lightweight modal for Bitcoin Cash dApps
+- New framework-agnostic, lightweight modal for Bitcoin Cash dApps
+
+**create-bch-dapp:**
+
+- New CLI to scaffold BCH dApps preconfigured with `bch-connect`
 
 ### Changed
 
