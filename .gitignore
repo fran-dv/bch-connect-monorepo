@@ -9,3 +9,6 @@ dist
 *.tgz
 *.tsbuildinfo
 .eslintcache
+.next
+.turbo
+build
