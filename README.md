@@ -17,7 +17,20 @@ A React library to seamlessly integrate Bitcoin Cash wallet connections in your 
 
 ## <a name="getting-started"></a> ⚡ Getting started
 
-Installing and using **bch-connect** is straightforward. Just follow these steps:
+### Quick Start
+
+The easiest way to build a BCH dApp is using our scaffolding tool. It sets up **React + Vite** or **Next.js** with TypeScript and BCH Connect pre-configured and ready to use.
+
+Just run:
+
+```bash
+bun create bch-dapp
+# Or use your preferred package manager.
+```
+
+### Manual installation
+
+If you already have a project and want to add **bch-connect**, follow these steps:
 
 **1. Install the package:**
 
