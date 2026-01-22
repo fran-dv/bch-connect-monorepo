@@ -6,8 +6,8 @@ export const config = createConfig({
   metadata: {
     name: "BCH Connect Starter",
     description: "You can change this metadata in the src/bchConnect.ts file.",
-    url: "http://localhost:5173",
-    icons: ["https://bitcoincash.org/img/green/bitcoin-cash-circle.svg"],
+    url: window.location.origin,
+    icons: [`${window.location.origin}/bch.svg`],
   },
   debug: true,
 });
