@@ -1,35 +1,35 @@
 "use client";
 
-import type { ReactNode } from "react";
-import { useEffect, useState } from "react";
-import { BCHConnectProvider, createConfig, CreatedConfig } from "bch-connect";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { BCHConnectProvider, createConfig } from "bch-connect";
 
 export function BCHConnectWrapper({ children }: { children: ReactNode }) {
-  const [config, setConfig] = useState<CreatedConfig | null>(null);
+  const [mounted, setMounted] = useState<boolean>(false);
 
   useEffect(() => {
-    if (config) return;
-    const network =
-      process.env.NEXT_PUBLIC_BCH_NETWORK === "testnet" ? "testnet" : "mainnet";
-
-    const projectId = process.env.NEXT_PUBLIC_REOWN_PROJECT_ID || "";
-
-    const cfg = createConfig({
-      projectId,
-      network,
-      metadata: {
-        name: "BCH Connect Starter",
-        description:
-          "You can change this metadata in the app/BCHConnectWrapper.tsx file.",
-        url: "http://localhost:3000",
-        icons: ["http://localhost:3000/bch.svg"],
-      },
-    });
-
-    setConfig(cfg);
+    setMounted(true);
   }, []);
 
-  if (!config) return null;
+  const config = useMemo(() => {
+    if (!mounted) return null;
 
+    return createConfig({
+      projectId: process.env.NEXT_PUBLIC_REOWN_PROJECT_ID || "",
+      network:
+        process.env.NEXT_PUBLIC_BCH_NETWORK === "testnet"
+          ? "testnet"
+          : "mainnet",
+      metadata: {
+        name: "BCH Connect Starter",
+        description: "Change this metadata in app/BCHConnectWrapper.tsx ",
+        url: window.location.origin,
+        icons: [`${window.location.origin}/bch.svg`],
+      },
+    });
+  }, [mounted]);
+
+  if (!config) {
+    return null;
+  }
   return <BCHConnectProvider config={config}>{children}</BCHConnectProvider>;
 }
