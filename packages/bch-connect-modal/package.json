@@ -1,48 +1,48 @@
 {
-  "name": "bch-connect-modal",
-  "version": "0.2.0",
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "devDependencies": {
-    "@testing-library/dom": "^10.4.1",
-    "@types/qrcode": "^1.5.5",
-    "@vitest/coverage-v8": "^4.0.15",
-    "concurrently": "^9.2.1",
-    "jsdom": "^27.3.0",
-    "serve": "^14.2.5",
-    "tsup": "^8.3.5",
-    "typescript": "^5.6.3",
-    "vitest": "^4.0.15"
-  },
-  "peerDependencies": {
-    "typescript": "^5"
-  },
-  "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    }
-  },
-  "description": "Framework-agnostic modal UI for BCH wallet connections in the browser",
-  "files": [
-    "dist/index.js",
-    "dist/index.global.js",
-    "dist/index.d.ts"
-  ],
-  "license": "MIT",
-  "private": false,
-  "scripts": {
-    "build": "tsup",
-    "build:prod": "tsup --minify",
-    "dev": "tsup --watch",
-    "dev:serve": "serve . -l tcp://0.0.0.0:4173",
-    "dev:playground": "concurrently \"bun run dev\" \"bun run dev:serve\"",
-    "test": "vitest",
-    "test:coverage": "vitest --coverage"
-  },
-  "type": "module",
-  "types": "./dist/index.d.ts",
-  "dependencies": {
-    "lean-qr": "^2.6.1"
-  }
+	"name": "bch-connect-modal",
+	"version": "0.2.0",
+	"main": "./dist/index.js",
+	"module": "./dist/index.js",
+	"devDependencies": {
+		"@testing-library/dom": "^10.4.1",
+		"@types/qrcode": "^1.5.5",
+		"@vitest/coverage-v8": "^4.0.15",
+		"concurrently": "^9.2.1",
+		"jsdom": "^27.3.0",
+		"serve": "^14.2.5",
+		"tsup": "^8.3.5",
+		"typescript": "^5.6.3",
+		"vitest": "^4.0.15"
+	},
+	"peerDependencies": {
+		"typescript": "^5"
+	},
+	"exports": {
+		".": {
+			"import": "./dist/index.js",
+			"types": "./dist/index.d.ts"
+		}
+	},
+	"description": "Framework-agnostic modal UI for BCH wallet connections in the browser",
+	"files": [
+		"dist/index.js",
+		"dist/index.global.js",
+		"dist/index.d.ts"
+	],
+	"license": "MIT",
+	"private": false,
+	"scripts": {
+		"build": "tsup",
+		"build:prod": "tsup --minify",
+		"dev": "tsup --watch",
+		"dev:serve": "serve . -l tcp://0.0.0.0:4173",
+		"dev:playground": "concurrently \"bun run dev\" \"bun run dev:serve\"",
+		"test": "vitest",
+		"test:coverage": "vitest --coverage"
+	},
+	"type": "module",
+	"types": "./dist/index.d.ts",
+	"dependencies": {
+		"lean-qr": "^2.6.1"
+	}
 }

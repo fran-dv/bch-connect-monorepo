@@ -1,19 +1,19 @@
-import { ElectrumNetworkProvider } from "cashscript";
+import type { ElectrumNetworkProvider } from "cashscript";
 import { create } from "zustand";
 
 interface NetworkProviderState {
-  provider: ElectrumNetworkProvider | null;
+	provider: ElectrumNetworkProvider | null;
 }
 
 interface NetworkProviderActions {
-  setProvider: (provider: ElectrumNetworkProvider) => void;
+	setProvider: (provider: ElectrumNetworkProvider) => void;
 }
 
 export const useNetworkProviderStore = create<
-  NetworkProviderState & NetworkProviderActions
+	NetworkProviderState & NetworkProviderActions
 >((set) => ({
-  provider: null,
-  setProvider: (provider) => set({ provider }),
+	provider: null,
+	setProvider: (provider) => set({ provider }),
 }));
 
 export default useNetworkProviderStore;

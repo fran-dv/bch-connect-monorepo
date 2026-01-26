@@ -1,10 +1,10 @@
+export type * from "@bch-wc2/interfaces";
+export { bchConnectModal } from "@/adapters/bchConnectModalAdapter";
+export { reownModal } from "@/adapters/reownModalAdapter";
+export { type CreatedConfig, createConfig } from "@/config/config";
 export * from "@/hooks/useSignMessage";
 export * from "@/hooks/useSignTransaction";
 export * from "@/hooks/useWallet";
-export * from "@/providers/BCHConnectProvider";
-export { createConfig, type CreatedConfig } from "@/config/config";
 export type { Configuration } from "@/models/config";
-export type * from "@bch-wc2/interfaces";
 export * from "@/models/modal";
-export { reownModal } from "@/adapters/reownModalAdapter";
-export { bchConnectModal } from "@/adapters/bchConnectModalAdapter";
+export * from "@/providers/BCHConnectProvider";

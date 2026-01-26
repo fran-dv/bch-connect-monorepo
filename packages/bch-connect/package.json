@@ -1,95 +1,75 @@
 {
-  "name": "bch-connect",
-  "private": false,
-  "version": "0.2.0",
-  "type": "module",
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "description": "Seamlessly connect Bitcoin Cash wallets to your React dApp.",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/fran-dv/bch-connect"
-  },
-  "homepage": "https://github.com/fran-dv/bch-connect#readme",
-  "bugs": {
-    "url": "https://github.com/fran-dv/bch-connect/issues"
-  },
-  "keywords": [
-    "bitcoin-cash",
-    "bch",
-    "walletconnect",
-    "wallet",
-    "react",
-    "dapp"
-  ],
-  "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    }
-  },
-  "sideEffects": false,
-  "scripts": {
-    "dev": "tsup --watch",
-    "build": "tsup",
-    "build:prod": "tsup --minify",
-    "lint": "eslint .",
-    "prepare": "husky",
-    "format": "prettier --write .",
-    "test": "vitest",
-    "test:coverage": "vitest --coverage"
-  },
-  "peerDependencies": {
-    "react": ">=18.0.0 <20.0.0",
-    "react-dom": ">=18.0.0 <20.0.0"
-  },
-  "dependencies": {
-    "@bch-wc2/interfaces": "^0.0.8",
-    "@bitauth/libauth": "^3.0.0",
-    "@reown/appkit": "^1.8.9",
-    "@reown/appkit-common": "^1.8.9",
-    "@walletconnect/sign-client": "^2.22.2",
-    "@walletconnect/types": "^2.22.2",
-    "sign-client-v2-20": "npm:@walletconnect/sign-client@2.20.3",
-    "walletconnect-types-v2-20": "npm:@walletconnect/types@2.20.3",
-    "bch-connect-modal": "^0.2.0"
-  },
-  "devDependencies": {
-    "@eslint/js": "^9.36.0",
-    "@testing-library/dom": "^10.4.1",
-    "@testing-library/jest-dom": "^6.9.1",
-    "@testing-library/react": "^16.3.0",
-    "@types/react": "^19.1.13",
-    "@types/react-dom": "^19.1.9",
-    "@vitejs/plugin-react": "^5.1.1",
-    "@vitest/coverage-v8": "4.0.15",
-    "eslint": "^9.36.0",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-react-hooks": "^5.2.0",
-    "eslint-plugin-react-refresh": "^0.4.20",
-    "globals": "^16.4.0",
-    "husky": "^9.1.7",
-    "jsdom": "^27.2.0",
-    "lint-staged": "^16.2.1",
-    "prettier": "3.6.2",
-    "tsup": "^8.5.0",
-    "typescript": "~5.8.3",
-    "typescript-eslint": "^8.44.0",
-    "vitest": "^4.0.15"
-  },
-  "files": [
-    "dist/index.js",
-    "dist/index.d.ts"
-  ],
-  "lint-staged": {
-    "**/*.{js,jsx,ts,tsx}": [
-      "eslint --fix",
-      "prettier --write"
-    ],
-    "**/*.{json,md,css,scss}": [
-      "prettier --write"
-    ]
-  }
+	"name": "bch-connect",
+	"private": false,
+	"version": "0.2.0",
+	"type": "module",
+	"main": "./dist/index.js",
+	"module": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"description": "Seamlessly connect Bitcoin Cash wallets to your React dApp.",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/fran-dv/bch-connect"
+	},
+	"homepage": "https://github.com/fran-dv/bch-connect#readme",
+	"bugs": {
+		"url": "https://github.com/fran-dv/bch-connect/issues"
+	},
+	"keywords": [
+		"bitcoin-cash",
+		"bch",
+		"walletconnect",
+		"wallet",
+		"react",
+		"dapp"
+	],
+	"exports": {
+		".": {
+			"import": "./dist/index.js",
+			"types": "./dist/index.d.ts"
+		}
+	},
+	"sideEffects": false,
+	"scripts": {
+		"dev": "tsup --watch",
+		"build": "tsup",
+		"build:prod": "tsup --minify",
+		"prepare": "husky",
+		"test": "vitest",
+		"test:coverage": "vitest --coverage"
+	},
+	"peerDependencies": {
+		"react": ">=18.0.0 <20.0.0",
+		"react-dom": ">=18.0.0 <20.0.0"
+	},
+	"dependencies": {
+		"@bch-wc2/interfaces": "^0.0.8",
+		"@bitauth/libauth": "^3.0.0",
+		"@reown/appkit": "^1.8.9",
+		"@reown/appkit-common": "^1.8.9",
+		"@walletconnect/sign-client": "^2.22.2",
+		"@walletconnect/types": "^2.22.2",
+		"sign-client-v2-20": "npm:@walletconnect/sign-client@2.20.3",
+		"walletconnect-types-v2-20": "npm:@walletconnect/types@2.20.3",
+		"bch-connect-modal": "^0.2.0"
+	},
+	"devDependencies": {
+		"@testing-library/dom": "^10.4.1",
+		"@testing-library/jest-dom": "^6.9.1",
+		"@testing-library/react": "^16.3.0",
+		"@types/react": "^19.1.13",
+		"@types/react-dom": "^19.1.9",
+		"@vitejs/plugin-react": "^5.1.1",
+		"@vitest/coverage-v8": "4.0.15",
+		"husky": "^9.1.7",
+		"jsdom": "^27.2.0",
+		"tsup": "^8.5.0",
+		"typescript": "~5.8.3",
+		"vitest": "^4.0.15"
+	},
+	"files": [
+		"dist/index.js",
+		"dist/index.d.ts"
+	]
 }

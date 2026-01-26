@@ -1,313 +1,315 @@
 // @vitest-environment jsdom
 import {
-  describe,
-  it,
-  expect,
-  vi,
-  beforeEach,
-  afterEach,
-  type Mock,
+	afterEach,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	type Mock,
+	vi,
 } from "vitest";
 import { ModalDOM } from "../dom";
-import { ModalWallet } from "../models/modal";
+import type { ModalWallet } from "../models/modal";
 import { isMobileDevice } from "../utils";
 
 const mockSetUri = vi.fn();
 const mockGetElement = vi.fn(() => {
-  const div = document.createElement("div");
-  div.className = "bchc-qr-section";
-  return div;
+	const div = document.createElement("div");
+	div.className = "bchc-qr-section";
+	return div;
 });
 const mockSwipeDestroy = vi.fn();
 
 vi.mock("../styles.css", () => ({ default: "" }));
 vi.mock("../assets/fonts/base64fonts", () => ({
-  zalandoSansFontBase64: "",
+	zalandoSansFontBase64: "",
 }));
 vi.mock("../assets/images/wc-logo.svg", () => ({ default: "logo.svg" }));
 
 vi.mock("../utils", () => ({
-  isMobileDevice: vi.fn(),
+	isMobileDevice: vi.fn(),
 }));
 
 vi.mock("../qrController", () => {
-  return {
-    QRController: class {
-      getElement = mockGetElement;
-      setUri = mockSetUri;
-      constructor() {}
-    },
-  };
+	return {
+		QRController: class {
+			getElement = mockGetElement;
+			setUri = mockSetUri;
+		},
+	};
 });
 
 vi.mock("../swipeController", () => {
-  return {
-    SwipeController: class {
-      destroy = mockSwipeDestroy;
-      constructor() {}
-    },
-  };
+	return {
+		SwipeController: class {
+			destroy = mockSwipeDestroy;
+		},
+	};
 });
 
 Object.defineProperty(window, "matchMedia", {
-  writable: true,
-  // eslint-disable-next-line
-  value: vi.fn().mockImplementation((query: any) => ({
-    matches: false,
-    media: query,
-    onchange: null,
-    addListener: vi.fn(),
-    removeListener: vi.fn(),
-    addEventListener: vi.fn(),
-    removeEventListener: vi.fn(),
-    dispatchEvent: vi.fn(),
-  })),
+	writable: true,
+	// biome-ignore lint/suspicious: any
+	value: vi.fn().mockImplementation((query: any) => ({
+		matches: false,
+		media: query,
+		onchange: null,
+		addListener: vi.fn(),
+		removeListener: vi.fn(),
+		addEventListener: vi.fn(),
+		removeEventListener: vi.fn(),
+		dispatchEvent: vi.fn(),
+	})),
 });
 
 Object.assign(navigator, {
-  clipboard: {
-    writeText: vi.fn(),
-  },
+	clipboard: {
+		writeText: vi.fn(),
+	},
 });
 
 vi.stubGlobal("open", vi.fn());
 
 const mockLocation = { href: "" };
 Object.defineProperty(window, "location", {
-  value: mockLocation,
-  writable: true,
+	value: mockLocation,
+	writable: true,
 });
 
 describe("ModalDOM", () => {
-  let modal: ModalDOM;
+	let modal: ModalDOM;
 
-  beforeEach(() => {
-    HTMLDialogElement.prototype.showModal = vi.fn(function (
-      this: HTMLDialogElement,
-    ) {
-      this.setAttribute("open", "");
-    });
-    HTMLDialogElement.prototype.close = vi.fn(function (
-      this: HTMLDialogElement,
-    ) {
-      this.removeAttribute("open");
-    });
-    Object.defineProperty(HTMLDialogElement.prototype, "open", {
-      get: function () {
-        return this.hasAttribute("open");
-      },
-      configurable: true,
-    });
+	beforeEach(() => {
+		HTMLDialogElement.prototype.showModal = vi.fn(function (
+			this: HTMLDialogElement,
+		) {
+			this.setAttribute("open", "");
+		});
+		HTMLDialogElement.prototype.close = vi.fn(function (
+			this: HTMLDialogElement,
+		) {
+			this.removeAttribute("open");
+		});
+		Object.defineProperty(HTMLDialogElement.prototype, "open", {
+			get: function () {
+				return this.hasAttribute("open");
+			},
+			configurable: true,
+		});
 
-    document.body.innerHTML = "";
-    vi.clearAllMocks();
-    vi.useFakeTimers();
+		document.body.innerHTML = "";
+		vi.clearAllMocks();
+		vi.useFakeTimers();
 
-    (isMobileDevice as Mock).mockReturnValue(false);
+		(isMobileDevice as Mock).mockReturnValue(false);
 
-    modal = new ModalDOM();
-    modal.mount();
-  });
+		modal = new ModalDOM();
+		modal.mount();
+	});
 
-  afterEach(() => {
-    vi.useRealTimers();
-    modal?.unmount();
-  });
+	afterEach(() => {
+		vi.useRealTimers();
+		modal?.unmount();
+	});
 
-  it("should be mounted to the document body", () => {
-    const root = document.querySelector(".bchc-root");
-    expect(root).toBeTruthy();
-    expect(root?.shadowRoot).toBeTruthy();
-  });
+	it("should be mounted to the document body", () => {
+		const root = document.querySelector(".bchc-root");
+		expect(root).toBeTruthy();
+		expect(root?.shadowRoot).toBeTruthy();
+	});
 
-  it("should create the correct shadow DOM structure", () => {
-    const root = document.querySelector(".bchc-root");
-    const shadow = root!.shadowRoot!;
+	it("should create the correct shadow DOM structure", () => {
+		const root = document.querySelector(".bchc-root");
+		if (!root || !root.shadowRoot) throw new Error("Root element not found");
 
-    expect(shadow.querySelector("dialog.bchc-modal-container")).toBeTruthy();
-    expect(shadow.querySelector(".bchc-header")).toBeTruthy();
-    expect(shadow.querySelector(".bchc-content")).toBeTruthy();
-  });
+		const shadow = root.shadowRoot;
 
-  it("should render the wallet list", () => {
-    const wallets: ModalWallet[] = [
-      {
-        id: "test",
-        name: "Test Wallet",
-        iconUrl: "img.png",
-        links: {
-          native: "app://",
-          web: "https://web.com",
-          fallback: "https://fallback.com",
-        },
-      },
-    ];
+		expect(shadow.querySelector("dialog.bchc-modal-container")).toBeTruthy();
+		expect(shadow.querySelector(".bchc-header")).toBeTruthy();
+		expect(shadow.querySelector(".bchc-content")).toBeTruthy();
+	});
 
-    modal.setWallets(wallets);
+	it("should render the wallet list", () => {
+		const wallets: ModalWallet[] = [
+			{
+				id: "test",
+				name: "Test Wallet",
+				iconUrl: "img.png",
+				links: {
+					native: "app://",
+					web: "https://web.com",
+					fallback: "https://fallback.com",
+				},
+			},
+		];
 
-    const root = document.querySelector(".bchc-root");
-    const shadow = root!.shadowRoot!;
-    const list = shadow.querySelector(".bchc-wallet-list");
-    const item = list?.querySelector("li button");
+		modal.setWallets(wallets);
 
-    expect(list?.children.length).toBe(1);
-    expect(item?.textContent).toContain("Test Wallet");
-  });
+		const root = document.querySelector(".bchc-root");
+		if (!root || !root.shadowRoot) throw new Error("Root element not found");
+		const shadow = root.shadowRoot;
+		const list = shadow.querySelector(".bchc-wallet-list");
+		const item = list?.querySelector("li button");
 
-  it("should handle wallet clicks and logic (Desktop)", () => {
-    (isMobileDevice as Mock).mockReturnValue(false);
+		expect(list?.children.length).toBe(1);
+		expect(item?.textContent).toContain("Test Wallet");
+	});
 
-    const walletSpy = vi.fn();
-    modal.onWalletClick(walletSpy);
-    modal.setUri("wc:123");
+	it("should handle wallet clicks and logic (Desktop)", () => {
+		(isMobileDevice as Mock).mockReturnValue(false);
 
-    const testWallet: ModalWallet = {
-      id: "web-wallet",
-      name: "Web Wallet",
-      iconUrl: "",
-      links: { fallback: "", web: "https://wallet.com/connect?uri={{uri}}" },
-    };
-    modal.setWallets([testWallet]);
+		const walletSpy = vi.fn();
+		modal.onWalletClick(walletSpy);
+		modal.setUri("wc:123");
 
-    const root = document.querySelector(".bchc-root");
-    const btn = root!.shadowRoot!.querySelector(
-      ".bchc-wallet-card",
-    ) as HTMLButtonElement;
-    btn.click();
+		const testWallet: ModalWallet = {
+			id: "web-wallet",
+			name: "Web Wallet",
+			iconUrl: "",
+			links: { fallback: "", web: "https://wallet.com/connect?uri={{uri}}" },
+		};
+		modal.setWallets([testWallet]);
 
-    const expectedUrl =
-      "https://wallet.com/connect?uri=" + encodeURIComponent("wc:123");
-    expect(window.open).toHaveBeenCalledWith(
-      expectedUrl,
-      "_blank",
-      "noopener,noreferrer",
-    );
-    expect(walletSpy).toHaveBeenCalledWith(testWallet);
-  });
+		const root = document.querySelector(".bchc-root");
+		if (!root || !root.shadowRoot) throw new Error("Root element not found");
+		const btn = root.shadowRoot.querySelector(
+			".bchc-wallet-card",
+		) as HTMLButtonElement;
+		btn.click();
 
-  it("should handle wallet clicks and logic (Mobile)", () => {
-    (isMobileDevice as Mock).mockReturnValue(true);
+		const expectedUrl = `https://wallet.com/connect?uri=${encodeURIComponent("wc:123")}`;
+		expect(window.open).toHaveBeenCalledWith(
+			expectedUrl,
+			"_blank",
+			"noopener,noreferrer",
+		);
+		expect(walletSpy).toHaveBeenCalledWith(testWallet);
+	});
 
-    mockLocation.href = "";
+	it("should handle wallet clicks and logic (Mobile)", () => {
+		(isMobileDevice as Mock).mockReturnValue(true);
 
-    modal.setUri("wc:456");
-    const testWallet: ModalWallet = {
-      id: "native-wallet",
-      name: "Native Wallet",
-      iconUrl: "",
-      links: { fallback: "", native: "app://wc?uri={{uri}}" },
-    };
-    modal.setWallets([testWallet]);
+		mockLocation.href = "";
 
-    const root = document.querySelector(".bchc-root");
-    const btn = root!.shadowRoot!.querySelector(
-      ".bchc-wallet-card",
-    ) as HTMLButtonElement;
-    btn.click();
+		modal.setUri("wc:456");
+		const testWallet: ModalWallet = {
+			id: "native-wallet",
+			name: "Native Wallet",
+			iconUrl: "",
+			links: { fallback: "", native: "app://wc?uri={{uri}}" },
+		};
+		modal.setWallets([testWallet]);
 
-    const expectedUrl = "app://wc?uri=" + encodeURIComponent("wc:456");
-    expect(mockLocation.href).toBe(expectedUrl);
-  });
+		const root = document.querySelector(".bchc-root");
+		if (!root || !root.shadowRoot) throw new Error("Root element not found");
+		const btn = root.shadowRoot.querySelector(
+			".bchc-wallet-card",
+		) as HTMLButtonElement;
+		btn.click();
 
-  it("should animate open correctly", () => {
-    modal.open();
+		const expectedUrl = `app://wc?uri=${encodeURIComponent("wc:456")}`;
+		expect(mockLocation.href).toBe(expectedUrl);
+	});
 
-    vi.runAllTimers();
-    vi.advanceTimersByTime(100);
+	it("should animate open correctly", () => {
+		modal.open();
 
-    const root = document.querySelector(".bchc-root");
-    expect(root?.classList.contains("bchc-active")).toBe(true);
-  });
+		vi.runAllTimers();
+		vi.advanceTimersByTime(100);
 
-  it("should animate close correctly", () => {
-    modal.open();
-    vi.runAllTimers();
+		const root = document.querySelector(".bchc-root");
+		expect(root?.classList.contains("bchc-active")).toBe(true);
+	});
 
-    modal.close();
+	it("should animate close correctly", () => {
+		modal.open();
+		vi.runAllTimers();
 
-    const root = document.querySelector(".bchc-root");
-    expect(root?.classList.contains("bchc-active")).toBe(false);
+		modal.close();
 
-    expect(HTMLDialogElement.prototype.close).not.toHaveBeenCalled();
+		const root = document.querySelector(".bchc-root");
+		expect(root?.classList.contains("bchc-active")).toBe(false);
 
-    vi.advanceTimersByTime(250);
+		expect(HTMLDialogElement.prototype.close).not.toHaveBeenCalled();
 
-    expect(HTMLDialogElement.prototype.close).toHaveBeenCalled();
-  });
+		vi.advanceTimersByTime(250);
 
-  it("should update URI on QR controller", () => {
-    modal.setUri("wc:new-uri");
-    expect(mockSetUri).toHaveBeenCalledWith("wc:new-uri");
-  });
+		expect(HTMLDialogElement.prototype.close).toHaveBeenCalled();
+	});
 
-  it("should close when clicking the backdrop", () => {
-    modal.open();
-    vi.runAllTimers();
+	it("should update URI on QR controller", () => {
+		modal.setUri("wc:new-uri");
+		expect(mockSetUri).toHaveBeenCalledWith("wc:new-uri");
+	});
 
-    const root = document.querySelector(".bchc-root");
-    const dialog = root!.shadowRoot!.querySelector(
-      "dialog",
-    ) as HTMLDialogElement;
+	it("should close when clicking the backdrop", () => {
+		modal.open();
+		vi.runAllTimers();
 
-    dialog.click();
+		const root = document.querySelector(".bchc-root");
+		if (!root || !root.shadowRoot) throw new Error("Root element not found");
+		const dialog = root.shadowRoot.querySelector("dialog") as HTMLDialogElement;
 
-    const rootAfterClick = document.querySelector(".bchc-root");
-    expect(rootAfterClick?.classList.contains("bchc-active")).toBe(false);
-  });
+		dialog.click();
 
-  it("should close when pressing Escape", () => {
-    modal.open();
-    vi.runAllTimers();
+		const rootAfterClick = document.querySelector(".bchc-root");
+		expect(rootAfterClick?.classList.contains("bchc-active")).toBe(false);
+	});
 
-    document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
+	it("should close when pressing Escape", () => {
+		modal.open();
+		vi.runAllTimers();
 
-    const root = document.querySelector(".bchc-root");
-    expect(root?.classList.contains("bchc-active")).toBe(false);
-  });
+		document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }));
 
-  it("should fallback to download page if mobile app fails to open", () => {
-    // eslint-disable-next-line
-    (window.matchMedia as any).mockImplementation(() => ({ matches: true }));
+		const root = document.querySelector(".bchc-root");
+		expect(root?.classList.contains("bchc-active")).toBe(false);
+	});
 
-    modal.setUri("wc:test");
-    const testWallet: ModalWallet = {
-      id: "native-only",
-      name: "Native",
-      iconUrl: "",
-      links: {
-        native: "app://wc?uri={{uri}}",
-        fallback: "https://fallback.com",
-      },
-    };
-    modal.setWallets([testWallet]);
+	it("should fallback to download page if mobile app fails to open", () => {
+		// biome-ignore lint/suspicious: any
+		(window.matchMedia as any).mockImplementation(() => ({ matches: true }));
 
-    const root = document.querySelector(".bchc-root");
-    const btn = root!.shadowRoot!.querySelector(
-      ".bchc-wallet-card",
-    ) as HTMLButtonElement;
+		modal.setUri("wc:test");
+		const testWallet: ModalWallet = {
+			id: "native-only",
+			name: "Native",
+			iconUrl: "",
+			links: {
+				native: "app://wc?uri={{uri}}",
+				fallback: "https://fallback.com",
+			},
+		};
+		modal.setWallets([testWallet]);
 
-    btn.click();
+		const root = document.querySelector(".bchc-root");
+		if (!root || !root.shadowRoot) throw new Error("Root element not found");
+		const btn = root.shadowRoot.querySelector(
+			".bchc-wallet-card",
+		) as HTMLButtonElement;
 
-    expect(window.location.href).toContain("app://wc");
+		btn.click();
 
-    vi.advanceTimersByTime(2000);
+		expect(window.location.href).toContain("app://wc");
 
-    expect(window.open).toHaveBeenCalledWith(
-      "https://fallback.com",
-      "_blank",
-      "noopener,noreferrer",
-    );
-  });
+		vi.advanceTimersByTime(2000);
 
-  it("should not crash if mounted multiple times", () => {
-    modal.mount();
-    expect(() => modal.mount()).not.toThrow();
-    expect(() => modal.mount()).not.toThrow();
-  });
+		expect(window.open).toHaveBeenCalledWith(
+			"https://fallback.com",
+			"_blank",
+			"noopener,noreferrer",
+		);
+	});
 
-  it("should not crash if unmounted multiple times", () => {
-    modal.unmount();
-    expect(() => modal.unmount()).not.toThrow();
-    expect(() => modal.unmount()).not.toThrow();
-  });
+	it("should not crash if mounted multiple times", () => {
+		modal.mount();
+		expect(() => modal.mount()).not.toThrow();
+		expect(() => modal.mount()).not.toThrow();
+	});
+
+	it("should not crash if unmounted multiple times", () => {
+		modal.unmount();
+		expect(() => modal.unmount()).not.toThrow();
+		expect(() => modal.unmount()).not.toThrow();
+	});
 });
