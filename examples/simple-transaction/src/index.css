@@ -1,18 +1,18 @@
 @import "tailwindcss";
 
 @theme {
-  --font-inter: "Inter", sans-serif;
+	--font-inter: "Inter", sans-serif;
 
-  --color-green-bch: #0ac18e;
-  --color-green-bch/10: rgba(10, 193, 142, 1);
-  --color-white-bch: #fff;
-  --color-black-bch: #4d4d4d;
+	--color-green-bch: #0ac18e;
+	--color-green-bch-10: rgba(10, 193, 142, 1);
+	--color-white-bch: #fff;
+	--color-black-bch: #4d4d4d;
 }
 
 @layer base {
-  html,
-  body {
-    font-family: var(--font-inter);
-    background-color: transparent;
-  }
+	html,
+	body {
+		font-family: var(--font-inter);
+		background-color: transparent;
+	}
 }
