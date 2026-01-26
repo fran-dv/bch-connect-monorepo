@@ -6,7 +6,6 @@
 	"scripts": {
 		"dev": "bunx --bun vite",
 		"build": "tsc -b && bunx --bun vite build",
-		"lint": "eslint .",
 		"preview": "bunx --bun vite preview",
 		"build:prod": "bunx netlify build",
 		"deploy": "bunx netlify deploy",
@@ -36,7 +35,6 @@
 		"@types/react-dom": "^19.1.9",
 		"globals": "^16.4.0",
 		"husky": "^9.1.7",
-		"lint-staged": "^16.2.1",
 		"typescript": "~5.8.3",
 		"vite": "^7.1.7"
 	}
