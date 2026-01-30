@@ -17,23 +17,27 @@ export const ConnectButton: React.FC<
 		disconnect();
 	};
 
+	const buttonClassName =
+		"bg-transparent rounded-full px-5 cursor-pointer py-2 hover:translate-y-px transition-transform text-white-bch font-bold text-sm sm:text-base";
 	return (
 		<div className="flex items-center gap-2 cursor-pointer">
 			<BackgroundGradient className="rounded-full cursor-pointer" animate>
-				<button
-					{...props}
-					type="button"
-					className="bg-transparent rounded-full px-5 cursor-pointer py-2 hover:translate-y-px transition-transform text-white-bch font-bold text-sm sm:text-base"
-					aria-label="Connect wallet"
-					title="Connect Bitcoin Cash wallet"
-					onClick={handleWalletConnect}
-				>
-					{isConnected && address ? (
+				{isConnected && address ? (
+					<div className={buttonClassName}>
 						<Address address={address} />
-					) : (
-						"Connect Wallet"
-					)}
-				</button>
+					</div>
+				) : (
+					<button
+						{...props}
+						type="button"
+						className={buttonClassName}
+						aria-label="Connect wallet"
+						title="Connect Bitcoin Cash wallet"
+						onClick={handleWalletConnect}
+					>
+						Connect Wallet
+					</button>
+				)}
 			</BackgroundGradient>
 			{isConnected && (
 				<button
