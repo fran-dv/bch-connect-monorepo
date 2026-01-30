@@ -1,51 +1,40 @@
 import { decodeCashAddress } from "@bitauth/libauth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type React from "react";
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod/v3";
 import { ControlledInput } from "@/components/forms/ControlledInput";
 import { CustomForm } from "@/components/forms/CustomForm";
 import { SubmitButton } from "@/components/forms/SubmitButton";
 
-const getTransferFormSchema = (balance: number) =>
-	z.object({
-		recipient: z
-			.string({ required_error: "Recipient is required" })
-			.refine((addr) => {
-				const result = decodeCashAddress(addr);
-				return typeof result !== "string";
-			}, "Invalid address. It must be in cashAddress format"),
-		satoshis: z
-			.number({ required_error: "Satoshis amount is required" })
-			.nonnegative("Amount must be positive")
-			.min(550, "Minimum amount is 550 satoshis")
-			.refine((amount) => amount <= balance, "Not enough funds"),
-	});
+const TransferFormSchema = z.object({
+	recipient: z
+		.string({ required_error: "Recipient is required" })
+		.refine((addr) => {
+			const result = decodeCashAddress(addr);
+			return typeof result !== "string";
+		}, "Invalid address. It must be in cashAddress format"),
+	satoshis: z
+		.number({ required_error: "Satoshis amount is required" })
+		.nonnegative("Amount must be positive")
+		.min(550, "Minimum amount is 550 satoshis"),
+});
 
-export type TransferFormValues = z.infer<
-	ReturnType<typeof getTransferFormSchema>
->;
+export type TransferFormValues = z.infer<typeof TransferFormSchema>;
 
 interface Props {
 	onSubmit: (values: TransferFormValues) => Promise<void>;
 	isLoading: boolean;
-	balance: number | undefined;
 }
 
-export const TransferForm: React.FC<Props> = ({
-	onSubmit,
-	isLoading,
-	balance,
-}) => {
-	const schema = useMemo(() => getTransferFormSchema(balance ?? 0), [balance]);
-
+export const TransferForm: React.FC<Props> = ({ onSubmit, isLoading }) => {
 	const methods = useForm<TransferFormValues>({
 		defaultValues: {
 			recipient: "",
 			satoshis: undefined,
 		},
-		resolver: zodResolver(schema),
+		resolver: zodResolver(TransferFormSchema),
 	});
 
 	const reset = useCallback(() => {
@@ -57,10 +46,6 @@ export const TransferForm: React.FC<Props> = ({
 		await onSubmit(values);
 		reset();
 	};
-
-	if (balance === undefined) {
-		return <div>Loading balance...</div>;
-	}
 
 	return (
 		<CustomForm onSubmit={handleSubmit} methods={methods}>

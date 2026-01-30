@@ -57,7 +57,6 @@ export const Example: React.FC = () => {
 			<TransferCard
 				isConnected={isConnected}
 				onFormSubmit={proposeTransactionToWallet}
-				balance={balance}
 				isLoading={isLoading}
 			/>
 			<WalletInfoCard

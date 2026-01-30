@@ -6,34 +6,22 @@ import {
 interface Props {
 	isConnected: boolean;
 	onFormSubmit: (values: TransferFormValues) => Promise<void>;
-	balance: number | undefined;
 	isLoading: boolean;
 }
 
 export const TransferCard: React.FC<Props> = ({
 	isConnected,
 	onFormSubmit,
-	balance,
 	isLoading,
 }: Props) => {
 	return (
 		<div className="flex w-full items-center p-6 md:p-10 bg-black-bch/75 z-10 rounded-3xl shadow-xl backdrop-blur-xs text-white-bch ">
-			{isConnected && balance !== undefined ? (
+			{isConnected ? (
 				<div className="flex flex-col gap-3 w-full">
 					<h2 className="text-xl md:text-2xl font-bold">
 						Transfer some sats (testnet)
 					</h2>
-					<TransferForm
-						onSubmit={onFormSubmit}
-						isLoading={isLoading}
-						balance={balance}
-					/>
-				</div>
-			) : isConnected && balance === undefined ? (
-				<div className="flex flex-col gap-2 align-baseline">
-					<h3 className="font-bold text-base sm:text-lg md:text-xl">
-						Loading balance...
-					</h3>
+					<TransferForm onSubmit={onFormSubmit} isLoading={isLoading} />
 				</div>
 			) : (
 				<div className="flex flex-col gap-2 align-baseline">
