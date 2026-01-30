@@ -1,8 +1,12 @@
-import type { ElectrumNetworkProvider } from "cashscript";
+import { ElectrumNetworkProvider } from "cashscript";
 import { create } from "zustand";
+import { currentNetwork } from "@/bchConnect";
+
+const network = currentNetwork === "testnet" ? "chipnet" : "mainnet";
+const defaultProvider = new ElectrumNetworkProvider(network);
 
 interface NetworkProviderState {
-	provider: ElectrumNetworkProvider | null;
+	provider: ElectrumNetworkProvider;
 }
 
 interface NetworkProviderActions {
@@ -12,7 +16,7 @@ interface NetworkProviderActions {
 export const useNetworkProviderStore = create<
 	NetworkProviderState & NetworkProviderActions
 >((set) => ({
-	provider: null,
+	provider: defaultProvider,
 	setProvider: (provider) => set({ provider }),
 }));
 

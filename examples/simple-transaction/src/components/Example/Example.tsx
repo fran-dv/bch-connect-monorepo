@@ -21,7 +21,7 @@ export const Example: React.FC = () => {
 	const [isLoading, setIsLoading] = useState(false);
 
 	const proposeTransactionToWallet = async (values: TransferFormValues) => {
-		if (!isConnected || !address || !provider) return;
+		if (!isConnected || !address) return;
 
 		setIsLoading(true);
 

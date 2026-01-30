@@ -12,7 +12,7 @@ export const useBalance = ({ address }: Props) => {
 	const isFetchingRef = useRef<boolean>(false);
 
 	useEffect(() => {
-		if (!address || !provider) return;
+		if (!address) return;
 
 		let current = true;
 		const fetchBalance = async () => {
