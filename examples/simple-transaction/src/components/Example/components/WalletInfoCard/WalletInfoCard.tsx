@@ -30,10 +30,10 @@ export const WalletInfoCard: React.FC<Props> = ({
 			</p>
 			<p className="inline-flex items-center">
 				<span className="mr-1 font-bold text-base sm:text-lg ">
-					Balance in sats:
+					Balance of connected address (sats):
 				</span>{" "}
 				{balanceError
-					? `${balanceError}. Please reload the page`
+					? `${balanceError}. Retrying...`
 					: (balance ?? "Loading balance...")}
 			</p>
 		</div>
