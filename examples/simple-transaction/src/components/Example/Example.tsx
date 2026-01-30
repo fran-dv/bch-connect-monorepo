@@ -53,7 +53,7 @@ export const Example: React.FC = () => {
 	};
 
 	return (
-		<section className="flex flex-col gap-6 pt-12 max-w-[800px] m-auto">
+		<section className="flex flex-col gap-6 pt-12 max-w-200 m-auto">
 			<TransferCard
 				isConnected={isConnected}
 				onFormSubmit={proposeTransactionToWallet}
